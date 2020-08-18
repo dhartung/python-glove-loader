@@ -11,7 +11,7 @@ class Embedding:
         assert (create_key == Embedding._create_key), \
             "Embeddings objects must be created using Embedding.load"
         self.rand_vector_for_oov = False
-        self.embedding_size = embedding_size
+        self.__embedding_size = embedding_size
 
     @staticmethod
     def load(filename: str, keep_in_memory: bool = True, check_embedding_health=False) -> 'Embedding':
@@ -38,6 +38,13 @@ class Embedding:
             return FileBasedEmbedding.load_from_file(filename, check_embedding_health)
 
     @property
+    def embedding_size(self):
+        """
+        Returns the size (dimension) of the embedding
+        """
+        return self.__embedding_size
+
+    @property
     def create_random_oov_vectors(self):
         """
         Indicates the behavior if a word is not presented in the vocabulary.
@@ -57,9 +64,9 @@ class Embedding:
 
     def _get_oov_vector(self):
         if self.rand_vector_for_oov:
-            return torch.randn(self.embedding_size)
+            return torch.randn(self.__embedding_size)
         else:
-            return torch.zeros(self.embedding_size)
+            return torch.zeros(self.__embedding_size)
 
     def get_tweet_embeddings(self, tweet: str) -> torch.Tensor:
         """
@@ -166,10 +173,10 @@ class FileBasedEmbedding(Embedding):
                     result[name] = last_pos
 
                 if embedding_length <= 0:
-                    embedding_length = binary_line.count(b" ") - 1
+                    embedding_length = binary_line.count(b" ")
 
                 if check_embedding_health and embedding_length > 0:
-                    assert binary_line.count(b" ") - 1 == embedding_length, \
+                    assert binary_line.count(b" ") == embedding_length, \
                         "All embedding vectors must have the same length"
 
                 last_pos = file.tell()
