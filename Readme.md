@@ -1,6 +1,6 @@
 # Python Glove Loader
 
-A simple loader for glove embeddings that supports a memory saving file read and a preprocessing for twitter data.
+A simple loader for glove embeddings that supports a memory saving embedding store and preprocessing for twitter data.
 
 Look at the following example to see how it works:
 
