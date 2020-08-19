@@ -165,7 +165,8 @@ class FileBasedEmbedding(Embedding):
         embedding_length = -1
         with open(file_name, 'rb') as file:
             last_pos = 0
-            while binary_line := file.readline():
+            binary_line = file.readline()
+            while binary_line:
                 name_end = binary_line.find(b" ")
                 if name_end >= 0:
                     binary_name = binary_line[:name_end]
@@ -180,6 +181,7 @@ class FileBasedEmbedding(Embedding):
                         "All embedding vectors must have the same length"
 
                 last_pos = file.tell()
+                binary_line = file.readline()
 
         return FileBasedEmbedding(Embedding._create_key, file_name, result, embedding_length)
 

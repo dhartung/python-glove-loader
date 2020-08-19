@@ -49,11 +49,11 @@ def tokenize(text, hashtag_mode: HashTagMode = HashTagMode.SPLIT, use_repeat_tok
     def re_sub(pattern, repl):
         return re.sub(pattern, repl, text, flags=regex_flags)
 
-    def hashtag(text):
-        text = text.group()
-        hashtag_body = text[1:]
+    def hashtag(hashtag_text):
+        hashtag_text = hashtag_text.group()
+        hashtag_body = hashtag_text[1:]
         if hashtag_mode == HashTagMode.KEEP:
-            return text
+            return hashtag_text
         elif hashtag_mode == HashTagMode.REPLACE:
             return "<hashtag>"
         elif hashtag_mode == HashTagMode.ATOMIC:
@@ -62,14 +62,15 @@ def tokenize(text, hashtag_mode: HashTagMode = HashTagMode.SPLIT, use_repeat_tok
             if hashtag_body.isupper():
                 return "<hashtag> {}".format(hashtag_body)
             else:
-                return " ".join(["<hashtag>"] + re.split(r"(?=[A-Z])", hashtag_body, flags=regex_flags))
+                return " ".join(["<hashtag>"] + re.findall(r"([a-zA-Z][^A-Z]+|[A-Z]+)", hashtag_body))
         elif hashtag_mode == HashTagMode.SPLIT_USING_PREFIX:
             if hashtag_body.isupper():
                 return "<hashtag> {}".format(hashtag_body)
             else:
-                return " ".join(["<hashtag> " + result for result in re.split(r"(?=[A-Z])", hashtag_body, flags=regex_flags)])
+                return " ".join(
+                    ["<hashtag> " + result for result in re.findall(r"([a-zA-Z][^A-Z]+|[A-Z]+)", hashtag_body)])
         else:
-            return text
+            return hashtag_text
 
     text = re_sub(r"https?:\/\/\S+\b|www\.(\w+\.)+\S*", "<url>")
     text = re_sub(r"@\w+", "<user>")
